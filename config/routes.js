@@ -34,26 +34,28 @@ export default [
                 component: './Welcome',
               },
               {
-                path: '/admin',
-                name: 'admin',
-                icon: 'crown',
-                component: './Admin',
-                authority: ['admin'],
-                routes: [
-                  {
-                    path: '/admin/sub-page',
-                    name: 'sub-page',
-                    icon: 'smile',
-                    component: './Welcome',
-                    authority: ['admin'],
-                  },
-                ],
-              },
-              {
                 name: 'list.table-list',
                 icon: 'table',
                 path: '/list',
                 component: './TableList',
+              },
+              {
+                name: 'clearing',
+                icon: 'clearing',
+                routes: [
+                  {
+                    name: 'flow',
+                    icon: 'flow',
+                    path: '/clearing/flow/',
+                    component: './Clearing/Views/clearingFlow/clearingFlowOne',
+                  },
+                  // {
+                  //   name: 'flow2',
+                  //   icon: 'flow',
+                  //   path: '/clearing/flow/',
+                  //   component: './Clearing/Views/clearingFlow/clearingFlowTwo',
+                  // },
+                ]
               },
               {
                 component: './404',

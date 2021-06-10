@@ -26,6 +26,8 @@ export default defineConfig({
   targets: {
     ie: 11,
   },
+  base: '/admin/',
+  publicPath: '/admin/',// base 是 react-router 的前缀
   // umi routes: https://umijs.org/docs/routing
   routes,
   // Theme for antd: https://ant.design/docs/react/customize-theme-cn
