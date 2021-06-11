@@ -1,54 +1,112 @@
 import React, { useEffect } from 'react'
+import ReactDOM from 'react-dom';
 import G6 from '@antv/g6';
 
 const data = {
   nodes: [{
     id: "1",
-    label: "请求回放1（开始）",
-    type: "begin"
-}, {
-    id: "2",
-    label: "交易创建"
+    label: "开始",
+    type: "begin",
+    type:'circle',
+    size:40,
+    x: 0,
+    y: 50,
+},{
+  id: "2",
+  label: "+",
+  type:'diamond',
+  size:40,
+  x: 100,
+  y: 0,
 }, {
     id: "3",
-    label: "请求回放3"
+    label: "同步交易数据"
 }, {
     id: "4",
-    label: "请求回放4"
+    label: "同步外部数据"
 }, {
-    id: "5",
-    label: "请求回放5"
+  id: "5",
+  label: "清洗交易数据"
 }, {
-    id: "6",
-    label: "请求回放6"
+  id: "6",
+  label: "清洗外部数据"
+},{
+  id: "7",
+  label: "+",
+  type:'diamond',
+  size:40
 }, {
-    id: "7",
-    label: "请求回放2（结束）",
+    id: "8",
+    label: "流水对账"
+}, {
+    id: "9",
+    label: "创建数据分片"
+}, {
+    id: "10",
+    label: "发送分片",
     type: "end"
+},{
+  id: "11",
+  label: "",
+  type:'circle',
+},{
+    id: "12",
+    label: "检查数据分片",
+    type: "end"
+},{
+  id: "13",
+  label: "检查数据分片不合格",
+  type: "end"
+},{
+  id: "14",
+  label: "结束",
+  type: "end"
 }],
   edges: [{
     source: "1",
-    target: "2"
-}, {
-    source: "1",
-    target: "3"
+    target: "2",
 }, {
     source: "2",
+    target: "3",
+}, {
+    source: "2",
+    target: "4"
+}, {
+    source: "3",
     target: "5"
 }, {
-    source: "5",
+    source: "4",
     target: "6"
+}, {
+    source: "5",
+    target: "7"
 }, {
     source: "6",
     target: "7"
 }, {
-    source: "3",
-    target: "4"
+  source: "7",
+  target: "8"
 }, {
-    source: "4",
-    target: "7"
+  source: "8",
+  target: "9"
+}, {
+  source: "9",
+  target: "10"
+}, {
+  source: "10",
+  target: "11"
+}, {
+  source: "11",
+  target: "12"
+}, {
+  source: "13",
+  target: "11"
+}, {
+  source: "13",
+  target: "14"
 }]
 };
+
   /**
    * node 特殊属性
    */
@@ -80,39 +138,54 @@ const Tutorital = () => {
     if(!graph) {
       // 实例化 Minimap
       const minimap = new G6.Minimap()
-      G6.registerNode("node", {
-        drawShape: function drawShape(cfg, group) {
-          var rect = group.addShape("rect", {
-            attrs: _extends({
-              x: -75,
-              y: -25,
-              width: 150,
-              height: 50,
-              radius: 4,
-              fill: "#FFD591",
-              fillOpacity: 1
-            }, nodeExtraAttrs[cfg.type])
-          });
-          return rect;
-        },
-        // 设置状态
-        setState: function setState(name, value, item) {
-          var group = item.getContainer();
-          var shape = group.get("children")[0]; // 顺序根据 draw 时确定
+      // G6.registerNode("node", {
+      //   drawShape: function drawShape(cfg, group) {
+      //     var rect = group.addShape("rect", {
+      //       attrs: _extends({
+      //         x: -50,
+      //         y: -20,
+      //         width: 100,
+      //         height: 40,
+      //         radius: 4,
+      //         fill: "#fff",
+      //         fillOpacity: 1,
+      //       })
+      //     });
+      //     if (cfg.name) {
+      //       group.addShape('text', {
+      //         attrs: {
+      //           text: cfg.name,
+      //           x: 0,
+      //           y: 0,
+      //           fill: '#00287E',
+      //           fontSize: 14,
+      //           textAlign: 'center',
+      //           textBaseline: 'middle',
+      //           fontWeight: 'bold'
+      //         }
+      //       });
+      //     }
+      //     console.log('rect',rect)
+      //     return rect;
+      //   },
+      //   // 设置状态
+      //   setState: function setState(name, value, item) {
+      //     var group = item.getContainer();
+      //     var shape = group.get("children")[0]; // 顺序根据 draw 时确定
     
-          if (name === "selected") {
-            if (value) {
-              shape.attr("fill", "#F6C277");
-            } else {
-              shape.attr("fill", "#FFD591");
-            }
-          }
-        },
+      //     if (name === "selected") {
+      //       if (value) {
+      //         shape.attr("fill", "#F6C277");
+      //       } else {
+      //         shape.attr("fill", "#FFD591");
+      //       }
+      //     }
+      //   },
     
-        getAnchorPoints: function getAnchorPoints() {
-          return [[0, 0.5], [1, 0.5]];
-        }
-      }, "single-shape");
+      //   getAnchorPoints: function getAnchorPoints() {
+      //     return [[0, 0.5], [1, 0.5]];
+      //   }
+      // }, "single-shape");
         /**
    * 自定义 edge 中心关系节点
    */
@@ -132,88 +205,67 @@ const Tutorital = () => {
    /**
    * 自定义带箭头的贝塞尔曲线 edge
    */
-    G6.registerEdge("line-with-arrow", {
-      itemType: "edge",
-      draw: function draw(cfg, group) {
-        var startPoint = cfg.startPoint;
-        var endPoint = cfg.endPoint;
-        var centerPoint = {
-          x: (startPoint.x + endPoint.x) / 2,
-          y: (startPoint.y + endPoint.y) / 2
-        };
-        // 控制点坐标
-        var controlPoint = {
-          x: (startPoint.x + centerPoint.x) / 2,
-          y: startPoint.y
-        };
-  
-        // 为了更好的展示效果, 对称贝塞尔曲线需要连到箭头根部
-        var path = group.addShape("path", {
-          attrs: {
-            path: [["M", startPoint.x, startPoint.y], ["Q", controlPoint.x + 8, controlPoint.y, centerPoint.x, centerPoint.y], ["T", endPoint.x - 8, endPoint.y], ["L", endPoint.x, endPoint.y]],
-            stroke: "#ccc",
-            lineWidth: 1.6,
-            endArrow: {
-              path: G6.Arrow.triangle(10, 20, 25), // 使用内置箭头路径函数，参数为箭头的 宽度、长度、偏移量（默认为 0，与 d 对应）
-              d: 25
-            }
-          }
-       });
-  
-        // 如果是不对称的贝塞尔曲线，需要计算贝塞尔曲线上的中心点
-        // 参考资料 https://stackoverflow.com/questions/54216448/how-to-find-a-middle-point-of-a-beizer-curve
-        // 具体Util方法可以参考G：https://github.com/antvis/g/blob/4.x/packages/g-math/src/quadratic.ts
-  
-        // 在贝塞尔曲线中心点上添加圆形
-        var source = cfg.source,
-          target = cfg.target;
-  
-        group.addShape("circle", {
-          attrs: {
-            id: "statusNode" + source + "-" + target,
-            r: 6,
-            x: centerPoint.x,
-            y: centerPoint.y,
-            fill: cfg.active ? "#AB83E4" : "#ccc"
-          }
-        });
-  
-        return path;
-      }
-    });
-  
-
-    graph = new G6.Graph({
-      container: ref.current,
-      width: 1000,
-      height: 800,
-      layout: {
-        type: 'dagre',
-        rankdir: 'LR'
-      },
-      modes: {
-        default: ['drag-canvas']
-      },
-      defaultNode: {
-        shape: "node",
-        labelCfg: {
-          style: {
-            fill: "#fff",
-            fontSize: 14
-          }
-        }
-      },
-      defaultEdge: {
-        shape: "line-with-arrow",
+    const width = window.innerWidth || 1200
+    const height = document.getElementById('container').scrollHeight || 500;
+    console.log('width',width,height)
+  //  graph = new G6.Graph({
+  //       container: ReactDOM.findDOMNode(ref.current),
+  //       width: 1200,
+  //       height: 800,
+  //       modes: {
+  //         default: ['drag-canvas'],
+  //       },
+  //       layout: {
+  //         type: 'dagre',
+  //         direction: 'LR',
+  //       },
+  //       defaultNode: {
+  //         shape: 'node',
+  //         labelCfg: {
+  //           style: {
+  //             fill: '#000000A6',
+  //             fontSize: 10,
+  //           },
+  //         },
+  //         style: {
+  //           stroke: '#72CC4A',
+  //           width: 150,
+  //         },
+  //       },
+  //       defaultEdge: {
+  //         shape: 'polyline',
+  //       },
+  //     });
+  //   }
+  graph = new G6.Graph({
+    container: ReactDOM.findDOMNode(ref.current),
+    width: 1200,
+    height: 800,
+    modes: {
+      default: ['drag-canvas'],
+    },
+    layout: {
+      type: 'dagre',
+      direction: 'LR',
+    },
+    defaultNode: {
+      shape: 'node',
+      labelCfg: {
         style: {
-          endArrow: true,
-          lineWidth: 2,
-          stroke: "#ccc"
-        }
-      }
-    });
-    }
-    
+          fill: '#000000A6',
+          fontSize: 10,
+        },
+      },
+      style: {
+        stroke: '#72CC4A',
+        width: 150,
+      },
+    },
+    defaultEdge: {
+      shape: 'polyline',
+    },
+  });
+}
     graph.data(data)
   
     graph.render()
@@ -230,7 +282,7 @@ const Tutorital = () => {
 
   }, [])
 
-  return <div ref={ref}></div>
+  return <div id="container"><div ref={ref} ></div></div>
 }
 
 export default Tutorital
